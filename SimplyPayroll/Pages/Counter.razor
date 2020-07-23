@@ -1,0 +1,69 @@
+﻿@page "/counter"
+
+@*<h1>Counter</h1>
+
+<p>Current count: @currentCount</p>
+
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+
+<h1>Payroll Calculator</h1>*@
+
+    <EditForm Model="@payroll">
+        <input type="text" name="hoursWorked" value="" />
+        <input type="text" name="hourlyRate" value="" />
+
+        <button class="btn btn-primary" @onclick="CalculateTax">Click me</button>
+    </EditForm>
+
+
+@code {
+    //private double currentCount = 0;
+
+    //private void IncrementCount()
+    //{
+    //    currentCount++;
+    //}
+
+    Counter payroll = new Counter();
+
+    // income
+    static double incomeWeekly;
+    static double incomeYearly = incomeWeekly * 52;
+
+
+    // USC
+    static double uscLimit1 = 12012;  // threshold of USC for the first amount of income
+    static double uscLimit2 = 8472;  // threshold of USC for the next amount of income
+    static double uscLimit3 = 49560;  // threshold of USC for the third amount of income
+    static double uscLimit4 ;   // threshold of USC for the remaing balance of income minus previous thresholds
+
+    static double uscRate1 = 0.005;  // USC rate for uscLimit1
+    static double uscRate2 = 0.02;  // USC rate for uscLimit2
+    static double uscRate3 = 0.045;  // USC rate for uscLimit3
+    static double uscRate4 = 0.08;  // USC rate for uscLimit4
+
+    static double usc1 = uscLimit1 * uscRate1;
+    static double usc2 = uscLimit2 * uscRate2;
+    static double usc3 = uscLimit3 * uscRate3;
+    static double usc4 = uscLimit4 * uscRate4;
+    static double uscTotal = usc1 + usc2 + usc3 + usc4;
+
+    // PRSI
+    static double prsiRate ;
+
+
+    // tax
+    static double taxCredit = 3300;
+
+    static double incomeLimitStandard = 35300;    // income threshold taxed at standard rate
+    static double incomeLimitHigher ;    // income threshold taxed at higher rate
+    static double taxRateStandard = 20;    // income threshold taxed at standard rate
+    static double taxRateHigher = 40;    // income threshold taxed at higher rate
+
+
+
+    void CalculateTax()
+    {
+
+    }
+}
