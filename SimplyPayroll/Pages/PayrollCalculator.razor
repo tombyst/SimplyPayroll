@@ -1,0 +1,38 @@
+﻿@*@page "/payrollcalculator"
+
+<h1>Payroll Calculator</h1>
+
+<EditForm Model="@payroll" OnSubmit="CalculateTax">
+    <div class="form-group row">
+        <label for="hoursWorked">Hours worked weekly</label>
+        <InputText id="hoursWorked" @bind-Value="hoursWorked" class="form-control col-sm-2" required />
+    </div>
+
+    <div class="form-group row">
+            <label for="hourlyRate">Hourly rate</label>
+            <InputText id="hourlyRate" @bind-Value="hourlyRate" class="form-control col-sm-2" required />
+        </div>
+
+
+    <button class="btn btn-primary" type="submit">Calculate</button>
+</EditForm>
+
+
+@code {
+    Payroll payroll = new Payroll();
+
+    public string hoursWorked;
+    public string hourlyRate;
+
+
+    public static double hoursWorkedEntered = Convert.ToDouble("hoursWorked");
+
+    public static double hourlyRateEntered = Convert.ToDouble("hourlyRate");
+
+
+    void CalculateTax()
+    {
+
+    }
+
+}*@
