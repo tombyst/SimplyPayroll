@@ -5,38 +5,47 @@
 <EditForm Model="@payroll" OnSubmit="Calculate">
     <div class="form-group row">
         <label for="hoursWorked">Hours worked weekly</label>
-        <InputText id="hoursWorked" @bind-Value="payroll.hoursWorked" class="form-control col-sm-2" required />
+        <InputNumber id="hoursWorked" @bind-Value="payroll.hoursWorked" class="form-control col-sm-2" required />
     </div>
 
     <div class="form-group row">
         <label for="hourlyRate">Hourly rate</label>
-        <InputText id="hourlyRate" @bind-Value="payroll.hourlyRate" class="form-control col-sm-2" required />
+        <InputNumber id="hourlyRate" @bind-Value="payroll.hourlyRate" class="form-control col-sm-2" required />
     </div>
 
 
     <button class="btn btn-primary" type="submit">Calculate</button>
 </EditForm>
 
+<br />
+<p>Hours worked: @payroll.hoursWorked</p>
+<p>Hourly rate: @payroll.hourlyRate</p>
+<br />
+<p>Income weekly gross: @incomeWeeklyGross</p>
+<p>Income yearly gross: @incomeYearlyGross</p>
+<br />
+<p>PRSI per year: @prsiTotal</p>
+
 
 @code {
     public class PayrollModel
     {
-        public string hoursWorked;
-        public string hourlyRate;
+        public double hoursWorked;
+        public double hourlyRate;
     }
 
     PayrollModel payroll = new PayrollModel();
 
 
-    public static double hoursWorkedEntered = Convert.ToDouble("hoursWorked");
-    public static double hourlyRateEntered = Convert.ToDouble("hourlyRate");
+    //public static double hoursWorkedEntered = Convert.ToDouble("hoursWorked");
+    //public static double hourlyRateEntered = Convert.ToDouble("hourlyRate");
 
 
 
 
     // income
-    static double incomeWeekly;
-    static double incomeYearlyGross = incomeWeekly * 52;
+    static double incomeWeeklyGross;
+    static double incomeYearlyGross;
 
     double incomeWeeklyNet;
 
@@ -58,8 +67,8 @@
     static double uscTotal = usc1 + usc2 + usc3 + usc4;
 
     // PRSI
-    static double prsiRate = 0.04;
-    static double prsiTotal = incomeYearlyGross * prsiRate;
+    double prsiRate = 0.04;
+    double prsiTotal;
 
 
     // tax
@@ -70,11 +79,28 @@
     static double taxRateStandard = 20;    // income threshold taxed at standard rate
     static double taxRateHigher = 40;    // income threshold taxed at higher rate
 
-
-
-    void Calculate()
+    double CalculateIncomeWeekly()
     {
+        return incomeWeeklyGross = payroll.hoursWorked * payroll.hourlyRate;
+    }
 
+    double CalculateIncomeYearlyGross()
+    {
+        return incomeYearlyGross = incomeWeeklyGross * 52;
+    }
+
+    //double CalculatePrsi()
+    //{
+    //    return prsiTotal = incomeYearlyGross * prsiRate;
+    //}
+
+
+    private void Calculate()
+    {
+        CalculateIncomeYearlyGross();
+        CalculateIncomeWeekly();
+
+        CalculatePrsi();
     }
 
 }
