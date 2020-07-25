@@ -13,7 +13,6 @@
         <InputNumber id="hourlyRate" @bind-Value="payroll.hourlyRate" class="form-control col-sm-2" required />
     </div>
 
-
     <button class="btn btn-primary" type="submit">Calculate</button>
 </EditForm>
 
@@ -25,6 +24,12 @@
 <p>Income yearly gross: @incomeYearlyGross</p>
 <br />
 <p>PRSI per year: @prsiTotal</p>
+<br />
+<p>USC1 per year: @usc1</p>
+<p>USC2 per year: @usc2</p>
+<p>USC3 per year: @usc3</p>
+<p>USC4 per year: @usc4</p>
+<p>USC total per year: @uscTotal</p>
 
 
 @code {
@@ -41,43 +46,21 @@
     //public static double hourlyRateEntered = Convert.ToDouble("hourlyRate");
 
 
-
-
     // income
     static double incomeWeeklyGross;
     static double incomeYearlyGross;
 
     double incomeWeeklyNet;
 
-    // USC
-    static double uscLimit1 = 12012;  // threshold of USC for the first amount of income
-    static double uscLimit2 = 8472;  // threshold of USC for the next amount of income
-    static double uscLimit3 = 49560;  // threshold of USC for the third amount of income
-    static double uscLimit4 = incomeYearlyGross - uscLimit1 - uscLimit2 - uscLimit3;   // threshold of USC for the remaing balance of income minus previous thresholds
-
-    static double uscRate1 = 0.005;  // USC rate for uscLimit1
-    static double uscRate2 = 0.02;  // USC rate for uscLimit2
-    static double uscRate3 = 0.045;  // USC rate for uscLimit3
-    static double uscRate4 = 0.08;  // USC rate for uscLimit4
-
-    static double usc1 = uscLimit1 * uscRate1;
-    static double usc2 = uscLimit2 * uscRate2;
-    static double usc3 = uscLimit3 * uscRate3;
-    static double usc4 = uscLimit4 * uscRate4;
-    static double uscTotal = usc1 + usc2 + usc3 + usc4;
-
-    // PRSI
-    static double prsiRate = 0.04;
-    static double prsiTotal;
 
 
     // tax
-    static double taxCredit = 3300;
+    //static double taxCredit = 3300;
 
-    static double incomeLimitStandard = 35300;    // income threshold taxed at standard rate
-    static double incomeLimitHigher = incomeYearlyGross - incomeLimitStandard;    // income threshold taxed at higher rate
-    static double taxRateStandard = 20;    // income threshold taxed at standard rate
-    static double taxRateHigher = 40;    // income threshold taxed at higher rate
+    //static double taxLimitStandard = 35300;    // income threshold taxed at standard rate
+    //static double taxLimitHigher = incomeYearlyGross - taxLimitStandard;    // income threshold taxed at higher rate
+    //static double taxRateStandard = 20;    // income threshold taxed at standard rate
+    //static double taxRateHigher = 40;    // income threshold taxed at higher rate
 
     // income
     double CalculateIncomeWeekly()
@@ -91,18 +74,90 @@
     }
 
     // PRSI
+    static double prsiRate = 0.04;
+    static double prsiTotal;
+
     double CalculatePrsi()
     {
         return prsiTotal = incomeYearlyGross * prsiRate;
     }
 
+    // USC
+    static double uscAmount1 = 12012;  // threshold of USC for the first amount of income
+    static double uscAmount2 = 8472;  // threshold of USC for the next amount of income
+    static double uscAmount3 = 49560;  // threshold of USC for the third amount of income
+    //static double uscAmount4;   // threshold of USC for the remaing balance of income minus previous thresholds
+
+    static double uscThreshold1 = uscAmount1;  // threshold of USC for the first amount of income
+    static double uscThreshold2 = uscThreshold1 + uscAmount2;  // threshold of USC for the next amount of income
+    static double uscThreshold3 = uscThreshold2 + uscAmount3;  // threshold of USC for the third amount of income
+    //static double uscThreshold4 = uscThreshold3;   // threshold of USC for the remaing balance of income minus previous thresholds
+
+    static double uscRate1 = 0.005;  // USC rate for uscThreshold1
+    static double uscRate2 = 0.02;  // USC rate for uscThreshold2
+    static double uscRate3 = 0.045;  // USC rate for uscThreshold3
+    static double uscRate4 = 0.08;  // USC rate for uscThreshold4
+
+    static double usc1;
+    static double usc2;
+    static double usc3;
+    static double usc4;
+    static double uscTotal;
+
+    double CalculateUsc()
+    {
+        if (incomeYearlyGross == 0)
+        {
+            usc1 = 0;
+            usc2 = 0;
+            usc3 = 0;
+            usc4 = 0;
+        }
+        // USC for the first threshold
+        if (incomeYearlyGross > 0 && incomeYearlyGross <= uscThreshold1)
+        {
+            usc1 = incomeYearlyGross * uscRate1;
+            usc2 = 0;
+            usc3 = 0;
+            usc4 = 0;
+        }
+        // USC for the next (second) threshold
+        else if (incomeYearlyGross > uscThreshold1 && incomeYearlyGross <= uscThreshold2)
+        {
+            usc1 = uscAmount1 * uscRate1;
+            //usc2 = uscAmount2 * uscRate2;
+            usc2 = (incomeYearlyGross - uscAmount1) * uscRate2;
+            usc3 = 0;
+            usc4 = 0;
+        }
+        // USC for the next (third) Amount
+        else if (incomeYearlyGross > uscThreshold2 && incomeYearlyGross <= uscThreshold3)
+        {
+            usc1 = uscAmount1 * uscRate1;
+            usc2 = uscAmount2 * uscRate2;
+            usc3 = (incomeYearlyGross - uscAmount1 - uscAmount2) * uscRate3;
+            usc4 = 0;
+        }
+        // USC for the remaining balance
+        else if (incomeYearlyGross > uscThreshold3)
+        {
+            usc1 = uscAmount1 * uscRate1;
+            usc2 = uscAmount2 * uscRate2;
+            usc3 = uscAmount3 * uscRate3;
+            usc4 = (incomeYearlyGross - uscAmount1 - uscAmount2 - uscAmount1) * uscRate4;
+        }
+        return uscTotal = usc1 + usc2 + usc3 + usc4;
+    }
+
 
     private void Calculate()
     {
-        CalculateIncomeYearlyGross();
         CalculateIncomeWeekly();
+        CalculateIncomeYearlyGross();
 
         CalculatePrsi();
+
+        CalculateUsc();
     }
 
 }
