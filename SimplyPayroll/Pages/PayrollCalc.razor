@@ -67,8 +67,8 @@
     static double uscTotal = usc1 + usc2 + usc3 + usc4;
 
     // PRSI
-    double prsiRate = 0.04;
-    double prsiTotal;
+    static double prsiRate = 0.04;
+    static double prsiTotal;
 
 
     // tax
@@ -79,6 +79,7 @@
     static double taxRateStandard = 20;    // income threshold taxed at standard rate
     static double taxRateHigher = 40;    // income threshold taxed at higher rate
 
+    // income
     double CalculateIncomeWeekly()
     {
         return incomeWeeklyGross = payroll.hoursWorked * payroll.hourlyRate;
@@ -89,10 +90,11 @@
         return incomeYearlyGross = incomeWeeklyGross * 52;
     }
 
-    //double CalculatePrsi()
-    //{
-    //    return prsiTotal = incomeYearlyGross * prsiRate;
-    //}
+    // PRSI
+    double CalculatePrsi()
+    {
+        return prsiTotal = incomeYearlyGross * prsiRate;
+    }
 
 
     private void Calculate()
