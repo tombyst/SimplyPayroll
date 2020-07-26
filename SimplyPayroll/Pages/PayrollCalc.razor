@@ -23,13 +23,23 @@
 <p>Income weekly gross: @incomeWeeklyGross</p>
 <p>Income yearly gross: @incomeYearlyGross</p>
 <br />
-<p>PRSI per year: @prsiTotal</p>
+<p><b>PRSI yearly: @prsiTotal</b></p>
 <br />
-<p>USC1 per year: @usc1</p>
-<p>USC2 per year: @usc2</p>
-<p>USC3 per year: @usc3</p>
-<p>USC4 per year: @usc4</p>
-<p>USC total per year: @uscTotal</p>
+<p>USC on the first @uscAmount1 yearly: @usc1</p>
+<p>USC on the next @uscAmount2 yearly: @usc2</p>
+<p>USC on the next @uscAmount3 yearly: @usc3</p>
+<p>USC on the balance yearly: @usc4</p>
+<p><b>USC total yearly: @uscTotal</b></p>
+<br />
+<p>Tax at 20%: @tax1</p>
+<p>Tax at 40%: @tax2</p>
+<p>Tax credit: @taxCredit</p>
+<p><b>Tax payable yearly: @taxTotalYearly</b></p>
+<br />
+<p><b>Total Deductions: @deductionsTotalYearly</b></p>
+<br />
+<p><b>Income yearly net: @incomeYearlyNet</b></p>
+<p><b>Income weekly net: @incomeWeeklyNet</b></p>
 
 
 @code {
@@ -50,20 +60,7 @@
     static double incomeWeeklyGross;
     static double incomeYearlyGross;
 
-    double incomeWeeklyNet;
-
-
-
-    // tax
-    //static double taxCredit = 3300;
-
-    //static double taxLimitStandard = 35300;    // income threshold taxed at standard rate
-    //static double taxLimitHigher = incomeYearlyGross - taxLimitStandard;    // income threshold taxed at higher rate
-    //static double taxRateStandard = 20;    // income threshold taxed at standard rate
-    //static double taxRateHigher = 40;    // income threshold taxed at higher rate
-
-    // income
-    double CalculateIncomeWeekly()
+    double CalculateIncomeWeeklyGross()
     {
         return incomeWeeklyGross = payroll.hoursWorked * payroll.hourlyRate;
     }
@@ -71,6 +68,38 @@
     double CalculateIncomeYearlyGross()
     {
         return incomeYearlyGross = incomeWeeklyGross * 52;
+    }
+
+    // tax
+    static double taxCredit = 3300;
+
+    static double taxLimitStandard = 35300;    // income threshold taxed at standard rate
+    static double taxLimitHigher = incomeYearlyGross - taxLimitStandard;    // income threshold taxed at higher rate
+    static double taxRateStandard = 0.2;    // income threshold taxed at standard rate
+    static double taxRateHigher = 0.4;    // income threshold taxed at higher rate
+    static double tax1;
+    static double tax2;
+    static double taxTotalYearly;
+
+    double CalculateTax()
+    {
+        if (incomeYearlyGross == 0)
+        {
+            tax1 = 0;
+            tax2 = 0;
+        }
+        else if (incomeYearlyGross > 0 && incomeYearlyGross <= taxLimitStandard)
+        {
+            tax1 = incomeYearlyGross * taxRateStandard;
+            tax2 = 0;
+        }
+        else if (incomeYearlyGross > taxLimitStandard)
+        {
+            tax1 = taxLimitStandard * taxRateStandard;
+            tax2 = (incomeYearlyGross - taxLimitStandard) * taxRateHigher;
+        }
+
+        return taxTotalYearly = tax1 + tax2 - taxCredit;
     }
 
     // PRSI
@@ -86,12 +115,12 @@
     static double uscAmount1 = 12012;  // threshold of USC for the first amount of income
     static double uscAmount2 = 8472;  // threshold of USC for the next amount of income
     static double uscAmount3 = 49560;  // threshold of USC for the third amount of income
-    //static double uscAmount4;   // threshold of USC for the remaing balance of income minus previous thresholds
+                                       //static double uscAmount4;   // threshold of USC for the remaing balance of income minus previous thresholds
 
     static double uscThreshold1 = uscAmount1;  // threshold of USC for the first amount of income
     static double uscThreshold2 = uscThreshold1 + uscAmount2;  // threshold of USC for the next amount of income
     static double uscThreshold3 = uscThreshold2 + uscAmount3;  // threshold of USC for the third amount of income
-    //static double uscThreshold4 = uscThreshold3;   // threshold of USC for the remaing balance of income minus previous thresholds
+                                                               //static double uscThreshold4 = uscThreshold3;   // threshold of USC for the remaing balance of income minus previous thresholds
 
     static double uscRate1 = 0.005;  // USC rate for uscThreshold1
     static double uscRate2 = 0.02;  // USC rate for uscThreshold2
@@ -149,15 +178,38 @@
         return uscTotal = usc1 + usc2 + usc3 + usc4;
     }
 
+    double deductionsTotalYearly;
 
-    private void Calculate()
+    double CalculateTotalDeductions()
     {
-        CalculateIncomeWeekly();
+        return deductionsTotalYearly = taxTotalYearly + prsiTotal + uscTotal;
+    }
+
+    double incomeYearlyNet;
+    double incomeWeeklyNet;
+
+    double CalculateIncomeYearlyNet()
+    {
+        return incomeYearlyNet = incomeYearlyGross - deductionsTotalYearly;
+    }
+
+    double CalculateIncomeWeeklyNet()
+    {
+        return incomeWeeklyNet = incomeYearlyNet / 52;
+    }
+
+    public void Calculate()
+    {
+        CalculateIncomeWeeklyGross();
         CalculateIncomeYearlyGross();
 
+        CalculateTax();
         CalculatePrsi();
-
         CalculateUsc();
+        CalculateTotalDeductions();
+
+        CalculateIncomeYearlyNet();
+        CalculateIncomeWeeklyNet();
     }
 
 }
