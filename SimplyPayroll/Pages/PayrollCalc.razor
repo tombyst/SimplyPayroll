@@ -1,4 +1,4 @@
-﻿@page "/payroll"
+﻿@page "/"
 
 <h1>Payroll Calculator</h1>
 
@@ -71,7 +71,7 @@
     }
 
     // tax
-    static double taxCredit = -3300;
+    static double taxCredit = 3300;
 
     static double taxLimitStandard = 35300;    // income threshold taxed at standard rate
     static double taxLimitHigher = incomeYearlyGross - taxLimitStandard;    // income threshold taxed at higher rate
@@ -87,6 +87,7 @@
         {
             tax1 = 0;
             tax2 = 0;
+            taxCredit = 0;
         }
         else if (incomeYearlyGross > 0 && incomeYearlyGross <= taxLimitStandard)
         {
@@ -99,7 +100,7 @@
             tax2 = (incomeYearlyGross - taxLimitStandard) * taxRateHigher;
         }
 
-        return taxTotalYearly = tax1 + tax2 + taxCredit;
+        return taxTotalYearly = tax1 + tax2 - taxCredit;
     }
 
     // PRSI
