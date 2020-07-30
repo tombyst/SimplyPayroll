@@ -34,7 +34,7 @@
 <p>Tax at 20%: @tax1</p>
 <p>Tax at 40%: @tax2</p>
 <p>Tax credit: @taxCredit</p>
-<p><b>Tax payable yearly: @taxTotalYearly</b></p>
+<p><b>Total Tax payable yearly: @totalTaxPayableYearly</b></p>
 <br />
 <p><b>Total Deductions: @deductionsTotalYearly</b></p>
 <br />
@@ -43,12 +43,6 @@
 
 
 @code {
-    public class PayrollModel
-    {
-        public double hoursWorked;
-        public double hourlyRate;
-    }
-
     PayrollModel payroll = new PayrollModel();
 
 
@@ -77,19 +71,21 @@
     static double taxLimitHigher = incomeYearlyGross - taxLimitStandard;    // income threshold taxed at higher rate
     static double taxRateStandard = 0.2;    // income threshold taxed at standard rate
     static double taxRateHigher = 0.4;    // income threshold taxed at higher rate
-    static double tax1;
-    static double tax2;
+    static double tax1;     // tax at standard rate
+    static double tax2;     // tax at higher rate
     static double taxTotalYearly;
+    static double totalTaxPayableYearly;   // total tax less tax credit
 
     double CalculateTax()
     {
-        if (incomeYearlyGross == 0)
+        if (incomeYearlyGross == 0 || incomeYearlyGross <= taxCredit)
         {
             tax1 = 0;
             tax2 = 0;
-            taxCredit = 0;
+            //taxCredit = 0;
+            return taxTotalYearly = tax1 + tax2;
         }
-        else if (incomeYearlyGross > 0 && incomeYearlyGross <= taxLimitStandard)
+        else if (incomeYearlyGross > 0 && incomeYearlyGross > taxCredit && incomeYearlyGross <= taxLimitStandard)
         {
             tax1 = incomeYearlyGross * taxRateStandard;
             tax2 = 0;
@@ -99,9 +95,22 @@
             tax1 = taxLimitStandard * taxRateStandard;
             tax2 = (incomeYearlyGross - taxLimitStandard) * taxRateHigher;
         }
-
         return taxTotalYearly = tax1 + tax2 - taxCredit;
     }
+
+    double CalculatetotalTaxPayableYearly()
+    {
+        if (taxTotalYearly < taxCredit)
+        {
+            return totalTaxPayableYearly = 0;
+        }
+        else
+        {
+            return totalTaxPayableYearly = taxTotalYearly - taxCredit;
+        }
+    }
+
+
 
     // PRSI
     static double prsiRate = 0.04;
@@ -183,7 +192,7 @@
 
     double CalculateTotalDeductions()
     {
-        return deductionsTotalYearly = taxTotalYearly + prsiTotal + uscTotal;
+        return deductionsTotalYearly = totalTaxPayableYearly + prsiTotal + uscTotal;
     }
 
     double incomeYearlyNet;
@@ -205,6 +214,7 @@
         CalculateIncomeYearlyGross();
 
         CalculateTax();
+        CalculatetotalTaxPayableYearly();
         CalculatePrsi();
         CalculateUsc();
         CalculateTotalDeductions();
