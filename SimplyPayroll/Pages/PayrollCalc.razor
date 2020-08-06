@@ -26,7 +26,7 @@
 <p><b>PRSI yearly: @prsiTotal.ToString("C")</b></p>
 <br />
 <p>USC on the first @uscCutOff1.ToString("C0") yearly: @usc1.ToString("C")</p>
-<p>USC on the next @uscCutOff2.ToString("C0") yearly: @usC.ToString("C")</p>
+<p>USC on the next @uscCutOff2.ToString("C0") yearly: @usc2.ToString("C")</p>
 <p>USC on the next @uscCutOff3.ToString("C0") yearly: @usc3.ToString("C")</p>
 <p>USC on the balance yearly: @usc4.ToString("C")</p>
 <p><b>USC total yearly: @uscTotal.ToString("C")</b></p>
@@ -44,10 +44,6 @@
 
 @code {
     PayrollModel payroll = new PayrollModel();
-
-
-    //public static double hoursWorkedEntered = Convert.ToDouble("hoursWorked");
-    //public static double hourlyRateEntered = Convert.ToDouble("hourlyRate");
 
 
     // income
@@ -111,7 +107,6 @@
     }
 
 
-
     // PRSI
     static double prsiRate = 0.04;
     static double prsiTotal;
@@ -125,12 +120,6 @@
     static int uscCutOff1 = 12012;  // first USC cut-off point
     static int uscCutOff2 = 8472;  // second USC cut-off point
     static int uscCutOff3 = 49560;  // third USC cut-off point
-    //static double uscCutOff4;   // threshold of USC for the remaing balance of income minus previous thresholds
-
-    //static double uscThreshold1 = uscCutOff1;  // threshold of USC for the first amount of income
-    //static double uscThreshold2 = uscCutOff1 + uscCutOff2;  // threshold of USC for the next amount of income
-    //static double uscThreshold3 = uscCutOff1 + uscCutOff2 + uscCutOff3;  // threshold of USC for the third amount of income
-    //static double uscThreshold4 = uscCutOff1 + uscCutOff2 + uscCutOff3;   // threshold of USC for the remaing balance of income minus previous thresholds
 
     static double uscExempt = 13000;    // income threshold exempt from USC
 
@@ -140,7 +129,7 @@
     static double uscRate4 = 0.08;  // USC rate for the remaining balance over three cut-off points
 
     static double usc1;
-    static double usC;
+    static double usc2;
     static double usc3;
     static double usc4;
     static double uscTotal;
@@ -150,31 +139,23 @@
         if (incomeYearlyGross == 0 || incomeYearlyGross <= uscExempt)
         {
             usc1 = 0;
-            usC = 0;
+            usc2 = 0;
             usc3 = 0;
             usc4 = 0;
         }
-        //// USC for the first threshold
-        //else if (incomeYearlyGross > uscExempt && incomeYearlyGross <= uscCutOff1)
-        //{
-        //    usc1 = incomeYearlyGross * uscRate1;
-        //    usC = 0;
-        //    usc3 = 0;
-        //    usc4 = 0;
-        //}
         // USC for the first and second cut-off point
         else if (incomeYearlyGross > uscExempt && incomeYearlyGross <= uscCutOff1 + uscCutOff2)
         {
             usc1 = uscCutOff1 * uscRate1;
-            usC = (incomeYearlyGross - uscCutOff1) * uscRate2;
+            usc2 = (incomeYearlyGross - uscCutOff1) * uscRate2;
             usc3 = 0;
             usc4 = 0;
         }
-        // USC for the next (third) Amount
+        // USC for the next (third) cut-off point
         else if (incomeYearlyGross > uscCutOff1 + uscCutOff2 && incomeYearlyGross <= uscCutOff1 + uscCutOff2 + uscCutOff3)
         {
             usc1 = uscCutOff1 * uscRate1;
-            usC = uscCutOff2 * uscRate2;
+            usc2 = uscCutOff2 * uscRate2;
             usc3 = (incomeYearlyGross - uscCutOff1 - uscCutOff2) * uscRate3;
             usc4 = 0;
         }
@@ -182,11 +163,11 @@
         else if (incomeYearlyGross > uscCutOff1 + uscCutOff2 + uscCutOff3)
         {
             usc1 = uscCutOff1 * uscRate1;
-            usC = uscCutOff2 * uscRate2;
+            usc2 = uscCutOff2 * uscRate2;
             usc3 = uscCutOff3 * uscRate3;
             usc4 = (incomeYearlyGross - uscCutOff1 - uscCutOff2 - uscCutOff3) * uscRate4;
         }
-        return uscTotal = usc1 + usC + usc3 + usc4;
+        return uscTotal = usc1 + usc2 + usc3 + usc4;
     }
 
     double deductionsTotalYearly;
