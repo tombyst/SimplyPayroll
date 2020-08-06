@@ -18,28 +18,28 @@
 
 <br />
 <p>Hours worked: @payroll.hoursWorked</p>
-<p>Hourly rate: @payroll.hourlyRate</p>
+<p>Hourly rate: @payroll.hourlyRate.ToString("C")</p>
 <br />
-<p>Gross income weekly : @incomeWeeklyGross</p>
-<p>Gross income yearly : @incomeYearlyGross</p>
+<p>Gross income weekly : @incomeWeeklyGross.ToString("C")</p>
+<p>Gross income yearly : @incomeYearlyGross.ToString("C")</p>
 <br />
-<p><b>PRSI yearly: @prsiTotal</b></p>
+<p><b>PRSI yearly: @prsiTotal.ToString("C")</b></p>
 <br />
-<p>USC on the first @uscCutOff1 yearly: @usc1</p>
-<p>USC on the next @uscCutOff2 yearly: @usc2</p>
-<p>USC on the next @uscCutOff3 yearly: @usc3</p>
-<p>USC on the balance yearly: @usc4</p>
-<p><b>USC total yearly: @uscTotal</b></p>
+<p>USC on the first @uscCutOff1.ToString("C0") yearly: @usc1.ToString("C")</p>
+<p>USC on the next @uscCutOff2.ToString("C0") yearly: @usC.ToString("C")</p>
+<p>USC on the next @uscCutOff3.ToString("C0") yearly: @usc3.ToString("C")</p>
+<p>USC on the balance yearly: @usc4.ToString("C")</p>
+<p><b>USC total yearly: @uscTotal.ToString("C")</b></p>
 <br />
-<p>Tax at 20%: @tax1</p>
-<p>Tax at 40%: @tax2</p>
-<p>Tax credit: @taxCredit</p>
-<p><b>Total Tax payable yearly: @totalTaxPayableYearly</b></p>
+<p>Tax at 20%: @tax1.ToString("C")</p>
+<p>Tax at 40%: @tax2.ToString("C")</p>
+<p>Tax credit: @taxCredit.ToString("C0")</p>
+<p><b>Total Tax payable yearly: @totalTaxPayableYearly.ToString("C")</b></p>
 <br />
-<p><b>Total Deductions: @deductionsTotalYearly</b></p>
+<p><b>Total Deductions: @deductionsTotalYearly.ToString("C")</b></p>
 <br />
-<p><b>Net income yearly: @incomeYearlyNet</b></p>
-<p><b>Net income weekly: @incomeWeeklyNet</b></p>
+<p><b>Net income yearly: @incomeYearlyNet.ToString("C")</b></p>
+<p><b>Net income weekly: @incomeWeeklyNet.ToString("C")</b></p>
 
 
 @code {
@@ -65,7 +65,7 @@
     }
 
     // tax
-    static double taxCredit = 3300;
+    static int taxCredit = 3300;
 
     static double taxLimitStandard = 35300;    // income threshold taxed at standard rate
     static double taxLimitHigher = incomeYearlyGross - taxLimitStandard;    // income threshold taxed at higher rate
@@ -122,9 +122,9 @@
     }
 
     // USC
-    static double uscCutOff1 = 12012;  // first USC cut-off point
-    static double uscCutOff2 = 8472;  // second USC cut-off point
-    static double uscCutOff3 = 49560;  // third USC cut-off point
+    static int uscCutOff1 = 12012;  // first USC cut-off point
+    static int uscCutOff2 = 8472;  // second USC cut-off point
+    static int uscCutOff3 = 49560;  // third USC cut-off point
     //static double uscCutOff4;   // threshold of USC for the remaing balance of income minus previous thresholds
 
     //static double uscThreshold1 = uscCutOff1;  // threshold of USC for the first amount of income
@@ -140,7 +140,7 @@
     static double uscRate4 = 0.08;  // USC rate for the remaining balance over three cut-off points
 
     static double usc1;
-    static double usc2;
+    static double usC;
     static double usc3;
     static double usc4;
     static double uscTotal;
@@ -150,7 +150,7 @@
         if (incomeYearlyGross == 0 || incomeYearlyGross <= uscExempt)
         {
             usc1 = 0;
-            usc2 = 0;
+            usC = 0;
             usc3 = 0;
             usc4 = 0;
         }
@@ -158,7 +158,7 @@
         //else if (incomeYearlyGross > uscExempt && incomeYearlyGross <= uscCutOff1)
         //{
         //    usc1 = incomeYearlyGross * uscRate1;
-        //    usc2 = 0;
+        //    usC = 0;
         //    usc3 = 0;
         //    usc4 = 0;
         //}
@@ -166,7 +166,7 @@
         else if (incomeYearlyGross > uscExempt && incomeYearlyGross <= uscCutOff1 + uscCutOff2)
         {
             usc1 = uscCutOff1 * uscRate1;
-            usc2 = (incomeYearlyGross - uscCutOff1) * uscRate2;
+            usC = (incomeYearlyGross - uscCutOff1) * uscRate2;
             usc3 = 0;
             usc4 = 0;
         }
@@ -174,7 +174,7 @@
         else if (incomeYearlyGross > uscCutOff1 + uscCutOff2 && incomeYearlyGross <= uscCutOff1 + uscCutOff2 + uscCutOff3)
         {
             usc1 = uscCutOff1 * uscRate1;
-            usc2 = uscCutOff2 * uscRate2;
+            usC = uscCutOff2 * uscRate2;
             usc3 = (incomeYearlyGross - uscCutOff1 - uscCutOff2) * uscRate3;
             usc4 = 0;
         }
@@ -182,11 +182,11 @@
         else if (incomeYearlyGross > uscCutOff1 + uscCutOff2 + uscCutOff3)
         {
             usc1 = uscCutOff1 * uscRate1;
-            usc2 = uscCutOff2 * uscRate2;
+            usC = uscCutOff2 * uscRate2;
             usc3 = uscCutOff3 * uscRate3;
             usc4 = (incomeYearlyGross - uscCutOff1 - uscCutOff2 - uscCutOff3) * uscRate4;
         }
-        return uscTotal = usc1 + usc2 + usc3 + usc4;
+        return uscTotal = usc1 + usC + usc3 + usc4;
     }
 
     double deductionsTotalYearly;
