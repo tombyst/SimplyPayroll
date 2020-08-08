@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace SimplyPayroll
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class PayrollModel
     {
         public double hoursWorked;

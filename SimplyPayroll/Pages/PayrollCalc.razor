@@ -1,50 +1,63 @@
 ﻿@page "/"
 
-<h1>Payroll Calculator</h1>
 
-<EditForm Model="@payroll" OnSubmit="Calculate">
-    <div class="form-group row ml-1">
-        <label for="hoursWorked">Hours worked weekly</label>
-        <InputNumber id="hoursWorked" @bind-Value="payroll.hoursWorked" class="form-control col-sm-2 ml-3" required />
+    <div class="container">
+        <div class="row">
+            <h1>Payroll Calculator</h1>
+        </div>
+        <div class="row mt-3">
+            <div class="col">
+                <EditForm Model="@payroll" OnSubmit="Calculate">
+                    <div class="form-group row">
+                        <label for="hoursWorked" class="col-form-label col-sm-7">Hours worked weekly</label>
+                        <InputNumber id="hoursWorked" @bind-Value="payroll.hoursWorked" class="form-control col-sm-3" required />
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="hourlyRate" class="col-form-label col-sm-7">Hourly rate</label>
+                        <InputNumber id="hourlyRate" @bind-Value="payroll.hourlyRate" class="form-control col-sm-3" required />
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-10 ml-3 ">
+                            <button class="btn btn-primary float-right" type="submit">Calculate</button>
+                        </div>
+                    </div>
+                    <hr />
+                    <p>Hours worked: @payroll.hoursWorked</p>
+                    <p>Hourly rate: @payroll.hourlyRate.ToString("C")</p>
+                </EditForm>
+            </div>
+
+            <div class="col">
+                <p>Gross income weekly : @incomeWeeklyGross.ToString("C")</p>
+                <p>Gross income yearly : @incomeYearlyGross.ToString("C")</p>
+                <hr />
+                <p><b>PRSI yearly: @prsiTotal.ToString("C")</b></p>
+                <hr />
+                <p>USC on the first @uscCutOff1.ToString("C0") yearly: @usc1.ToString("C")</p>
+                <p>USC on the next @uscCutOff2.ToString("C0") yearly: @usc2.ToString("C")</p>
+                <p>USC on the next @uscCutOff3.ToString("C0") yearly: @usc3.ToString("C")</p>
+                <p>USC on the balance yearly: @usc4.ToString("C")</p>
+                <p><b>USC total yearly: @uscTotal.ToString("C")</b></p>
+                <hr />
+                <p>Tax at 20%: @tax1.ToString("C")</p>
+                <p>Tax at 40%: @tax2.ToString("C")</p>
+                <p>Tax credit: @taxCredit.ToString("C0")</p>
+                <p><b>Total Tax payable yearly: @totalTaxPayableYearly.ToString("C")</b></p>
+                <hr />
+                <p><b>Total Deductions: @deductionsTotalYearly.ToString("C")</b></p>
+                <hr />
+                <div class="bg-light pt-3 pb-1 ml-1">
+                    <p><b>Net income yearly: @incomeYearlyNet.ToString("C")</b></p>
+                    <p><b>Net income weekly: @incomeWeeklyNet.ToString("C")</b></p>
+                </div>            
+            </div>
+        </div>
     </div>
-
-    <div class="form-group row ml-1">
-        <label for="hourlyRate">Hourly rate</label>
-        <InputNumber id="hourlyRate" @bind-Value="payroll.hourlyRate" class="form-control col-sm-2 ml-3" required />
-    </div>
-
-    <button class="btn btn-primary" type="submit">Calculate</button>
-</EditForm>
-
-<br />
-<p>Hours worked: @payroll.hoursWorked</p>
-<p>Hourly rate: @payroll.hourlyRate.ToString("C")</p>
-<br />
-<p>Gross income weekly : @incomeWeeklyGross.ToString("C")</p>
-<p>Gross income yearly : @incomeYearlyGross.ToString("C")</p>
-<br />
-<p><b>PRSI yearly: @prsiTotal.ToString("C")</b></p>
-<br />
-<p>USC on the first @uscCutOff1.ToString("C0") yearly: @usc1.ToString("C")</p>
-<p>USC on the next @uscCutOff2.ToString("C0") yearly: @usc2.ToString("C")</p>
-<p>USC on the next @uscCutOff3.ToString("C0") yearly: @usc3.ToString("C")</p>
-<p>USC on the balance yearly: @usc4.ToString("C")</p>
-<p><b>USC total yearly: @uscTotal.ToString("C")</b></p>
-<br />
-<p>Tax at 20%: @tax1.ToString("C")</p>
-<p>Tax at 40%: @tax2.ToString("C")</p>
-<p>Tax credit: @taxCredit.ToString("C0")</p>
-<p><b>Total Tax payable yearly: @totalTaxPayableYearly.ToString("C")</b></p>
-<br />
-<p><b>Total Deductions: @deductionsTotalYearly.ToString("C")</b></p>
-<br />
-<p><b>Net income yearly: @incomeYearlyNet.ToString("C")</b></p>
-<p><b>Net income weekly: @incomeWeeklyNet.ToString("C")</b></p>
-
 
 @code {
     PayrollModel payroll = new PayrollModel();
-
 
     // income
     static double incomeWeeklyGross;
@@ -61,16 +74,14 @@
     }
 
     // tax
-    static int taxCredit = 3300;
-
-    static double taxLimitStandard = 35300;    // income threshold taxed at standard rate
-    static double taxLimitHigher = incomeYearlyGross - taxLimitStandard;    // income threshold taxed at higher rate
-    static double taxRateStandard = 0.2;    // income threshold taxed at standard rate
-    static double taxRateHigher = 0.4;    // income threshold taxed at higher rate
-    static double tax1;     // tax at standard rate
-    static double tax2;     // tax at higher rate
-    static double taxTotalYearly;
-    static double totalTaxPayableYearly;   // total tax yearly less tax credit
+    int taxCredit = 3300;
+    double taxLimitStandard = 35300;    // income threshold taxed at standard rate
+    double taxRateStandard = 0.2;    // income threshold taxed at standard rate
+    double taxRateHigher = 0.4;    // income threshold taxed at higher rate
+    double tax1;     // tax at standard rate
+    double tax2;     // tax at higher rate
+    double taxTotalYearly;
+    double totalTaxPayableYearly;   // total tax yearly less tax credit
 
     double CalculateTotalTaxYearly()  // total tax yearly before tax credit
     {
@@ -81,7 +92,9 @@
             //taxCredit = 0;
             return taxTotalYearly = tax1 + tax2;
         }
-        else if (incomeYearlyGross > 0 && incomeYearlyGross > taxCredit && incomeYearlyGross <= taxLimitStandard)
+        else if (incomeYearlyGross > 0
+            && incomeYearlyGross > taxCredit
+            && incomeYearlyGross <= taxLimitStandard)
         {
             tax1 = incomeYearlyGross * taxRateStandard;
             tax2 = 0;
