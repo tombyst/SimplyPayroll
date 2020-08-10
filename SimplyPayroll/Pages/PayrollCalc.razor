@@ -1,34 +1,36 @@
 ﻿@page "/"
 
 
-    <div class="container">
-        <div class="row">
-            <h1>Payroll Calculator</h1>
+<div class="container">
+    <div class="row">
+        <h1>Payroll Calculator</h1>
+    </div>
+    <div class="row mt-3">
+        <div class="col">
+            <EditForm Model="@payroll" OnSubmit="Calculate">
+                <div class="form-group row">
+                    <label for="hoursWorked" class="col-form-label col-sm-7">Hours worked weekly</label>
+                    <InputNumber id="hoursWorked" @bind-Value="payroll.hoursWorked" class="form-control col-sm-3" required />
+                </div>
+
+                <div class="form-group row">
+                    <label for="hourlyRate" class="col-form-label col-sm-7">Hourly rate</label>
+                    <InputNumber id="hourlyRate" @bind-Value="payroll.hourlyRate" class="form-control col-sm-3" required />
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-10 ml-3 ">
+                        <button class="btn btn-primary float-right" type="submit">Calculate</button>
+                    </div>
+                </div>
+                <hr />
+                <p>Hours worked weekly: @payroll.hoursWorked</p>
+                <p>Hourly rate: @payroll.hourlyRate.ToString("C")</p>
+            </EditForm>
         </div>
-        <div class="row mt-3">
-            <div class="col">
-                <EditForm Model="@payroll" OnSubmit="Calculate">
-                    <div class="form-group row">
-                        <label for="hoursWorked" class="col-form-label col-sm-7">Hours worked weekly</label>
-                        <InputNumber id="hoursWorked" @bind-Value="payroll.hoursWorked" class="form-control col-sm-3" required />
-                    </div>
 
-                    <div class="form-group row">
-                        <label for="hourlyRate" class="col-form-label col-sm-7">Hourly rate</label>
-                        <InputNumber id="hourlyRate" @bind-Value="payroll.hourlyRate" class="form-control col-sm-3" required />
-                    </div>
-
-                    <div class="row">
-                        <div class="col-sm-10 ml-3 ">
-                            <button class="btn btn-primary float-right" type="submit">Calculate</button>
-                        </div>
-                    </div>
-                    <hr />
-                    <p>Hours worked: @payroll.hoursWorked</p>
-                    <p>Hourly rate: @payroll.hourlyRate.ToString("C")</p>
-                </EditForm>
-            </div>
-
+        @if (results == true && payroll.hoursWorked != 0 && payroll.hourlyRate != 0)
+        {
             <div class="col">
                 <p>Gross income weekly : @incomeWeeklyGross.ToString("C")</p>
                 <p>Gross income yearly : @incomeYearlyGross.ToString("C")</p>
@@ -51,171 +53,181 @@
                 <div class="bg-light pt-3 pb-1 ml-1">
                     <p><b>Net income yearly: @incomeYearlyNet.ToString("C")</b></p>
                     <p><b>Net income weekly: @incomeWeeklyNet.ToString("C")</b></p>
-                </div>            
+                </div>
             </div>
-        </div>
+        }
     </div>
+</div>
 
-@code {
-    PayrollModel payroll = new PayrollModel();
 
-    // income
-    static double incomeWeeklyGross;
-    static double incomeYearlyGross;
+        @code {
+            PayrollModel payroll = new PayrollModel();
 
-    double CalculateIncomeWeeklyGross()
-    {
-        return incomeWeeklyGross = payroll.hoursWorked * payroll.hourlyRate;
-    }
+            // income
+            static double incomeWeeklyGross;
+            static double incomeYearlyGross;
 
-    double CalculateIncomeYearlyGross()
-    {
-        return incomeYearlyGross = incomeWeeklyGross * 52;
-    }
+            double CalculateIncomeWeeklyGross()
+            {
+                return incomeWeeklyGross = payroll.hoursWorked * payroll.hourlyRate;
+            }
 
-    // tax
-    int taxCredit = 3300;
-    double taxLimitStandard = 35300;    // income threshold taxed at standard rate
-    double taxRateStandard = 0.2;    // income threshold taxed at standard rate
-    double taxRateHigher = 0.4;    // income threshold taxed at higher rate
-    double tax1;     // tax at standard rate
-    double tax2;     // tax at higher rate
-    double taxTotalYearly;
-    double totalTaxPayableYearly;   // total tax yearly less tax credit
+            double CalculateIncomeYearlyGross()
+            {
+                return incomeYearlyGross = incomeWeeklyGross * 52;
+            }
 
-    double CalculateTotalTaxYearly()  // total tax yearly before tax credit
-    {
-        if (incomeYearlyGross == 0 || incomeYearlyGross <= taxCredit)
-        {
-            tax1 = 0;
-            tax2 = 0;
-            //taxCredit = 0;
-            return taxTotalYearly = tax1 + tax2;
+            // tax
+            int taxCredit = 3300;
+            double taxLimitStandard = 35300;    // income threshold taxed at standard rate
+            double taxRateStandard = 0.2;    // income threshold taxed at standard rate
+            double taxRateHigher = 0.4;    // income threshold taxed at higher rate
+            double tax1;     // tax at standard rate
+            double tax2;     // tax at higher rate
+            double taxTotalYearly;
+            double totalTaxPayableYearly;   // total tax yearly less tax credit
+
+            double CalculateTotalTaxYearly()  // total tax yearly before tax credit
+            {
+                if (incomeYearlyGross == 0 || incomeYearlyGross <= taxCredit)
+                {
+                    tax1 = 0;
+                    tax2 = 0;
+                    //taxCredit = 0;
+                    return taxTotalYearly = tax1 + tax2;
+                }
+                else if (incomeYearlyGross > 0
+                    && incomeYearlyGross > taxCredit
+                    && incomeYearlyGross <= taxLimitStandard)
+                {
+                    tax1 = incomeYearlyGross * taxRateStandard;
+                    tax2 = 0;
+                }
+                else if (incomeYearlyGross > taxLimitStandard)
+                {
+                    tax1 = taxLimitStandard * taxRateStandard;
+                    tax2 = (incomeYearlyGross - taxLimitStandard) * taxRateHigher;
+                }
+                return taxTotalYearly = tax1 + tax2;
+            }
+
+            double CalculateTotalTaxPayableYearly()
+            {
+                if (taxTotalYearly < taxCredit)
+                {
+                    return totalTaxPayableYearly = 0;
+                }
+                else
+                {
+                    return totalTaxPayableYearly = taxTotalYearly - taxCredit;
+                }
+            }
+
+
+            // PRSI
+            static double prsiRate = 0.04;
+            static double prsiTotal;
+
+            double CalculatePrsi()
+            {
+                return prsiTotal = incomeYearlyGross * prsiRate;
+            }
+
+            // USC
+            static int uscCutOff1 = 12012;  // first USC cut-off point
+            static int uscCutOff2 = 8472;  // second USC cut-off point
+            static int uscCutOff3 = 49560;  // third USC cut-off point
+
+            static double uscExempt = 13000;    // income threshold exempt from USC
+
+            static double uscRate1 = 0.005;  // USC rate for first cut-off point (uscCutOff1)
+            static double uscRate2 = 0.02;  // USC rate for second cut-off point (uscCutOff2)
+            static double uscRate3 = 0.045;  // USC rate for third cut-off point (uscCutOff3)
+            static double uscRate4 = 0.08;  // USC rate for the remaining balance over three cut-off points
+
+            static double usc1;
+            static double usc2;
+            static double usc3;
+            static double usc4;
+            static double uscTotal;
+
+            double CalculateUsc()
+            {
+                if (incomeYearlyGross == 0 || incomeYearlyGross <= uscExempt)
+                {
+                    usc1 = 0;
+                    usc2 = 0;
+                    usc3 = 0;
+                    usc4 = 0;
+                }
+                // USC for the first and second cut-off point
+                else if (incomeYearlyGross > uscExempt && incomeYearlyGross <= uscCutOff1 + uscCutOff2)
+                {
+                    usc1 = uscCutOff1 * uscRate1;
+                    usc2 = (incomeYearlyGross - uscCutOff1) * uscRate2;
+                    usc3 = 0;
+                    usc4 = 0;
+                }
+                // USC for the next (third) cut-off point
+                else if (incomeYearlyGross > uscCutOff1 + uscCutOff2 && incomeYearlyGross <= uscCutOff1 + uscCutOff2 + uscCutOff3)
+                {
+                    usc1 = uscCutOff1 * uscRate1;
+                    usc2 = uscCutOff2 * uscRate2;
+                    usc3 = (incomeYearlyGross - uscCutOff1 - uscCutOff2) * uscRate3;
+                    usc4 = 0;
+                }
+                // USC for the remaining balance
+                else if (incomeYearlyGross > uscCutOff1 + uscCutOff2 + uscCutOff3)
+                {
+                    usc1 = uscCutOff1 * uscRate1;
+                    usc2 = uscCutOff2 * uscRate2;
+                    usc3 = uscCutOff3 * uscRate3;
+                    usc4 = (incomeYearlyGross - uscCutOff1 - uscCutOff2 - uscCutOff3) * uscRate4;
+                }
+                return uscTotal = usc1 + usc2 + usc3 + usc4;
+            }
+
+            double deductionsTotalYearly;
+
+            double CalculateTotalDeductions()
+            {
+                return deductionsTotalYearly = totalTaxPayableYearly + prsiTotal + uscTotal;
+            }
+
+            double incomeYearlyNet;
+            double incomeWeeklyNet;
+
+            double CalculateIncomeYearlyNet()
+            {
+                return incomeYearlyNet = incomeYearlyGross - deductionsTotalYearly;
+            }
+
+            double CalculateIncomeWeeklyNet()
+            {
+                return incomeWeeklyNet = incomeYearlyNet / 52;
+            }
+
+            bool results = false;
+            bool DisplayResults()
+            {
+                //bool results = false;
+                return results = true;
+            }
+
+            public void Calculate()
+            {
+                CalculateIncomeWeeklyGross();
+                CalculateIncomeYearlyGross();
+
+                CalculateTotalTaxYearly();
+                CalculateTotalTaxPayableYearly();
+                CalculatePrsi();
+                CalculateUsc();
+                CalculateTotalDeductions();
+
+                CalculateIncomeYearlyNet();
+                CalculateIncomeWeeklyNet();
+                DisplayResults();
+            }
+
         }
-        else if (incomeYearlyGross > 0
-            && incomeYearlyGross > taxCredit
-            && incomeYearlyGross <= taxLimitStandard)
-        {
-            tax1 = incomeYearlyGross * taxRateStandard;
-            tax2 = 0;
-        }
-        else if (incomeYearlyGross > taxLimitStandard)
-        {
-            tax1 = taxLimitStandard * taxRateStandard;
-            tax2 = (incomeYearlyGross - taxLimitStandard) * taxRateHigher;
-        }
-        return taxTotalYearly = tax1 + tax2;
-    }
-
-    double CalculateTotalTaxPayableYearly()
-    {
-        if (taxTotalYearly < taxCredit)
-        {
-            return totalTaxPayableYearly = 0;
-        }
-        else
-        {
-            return totalTaxPayableYearly = taxTotalYearly - taxCredit;
-        }
-    }
-
-
-    // PRSI
-    static double prsiRate = 0.04;
-    static double prsiTotal;
-
-    double CalculatePrsi()
-    {
-        return prsiTotal = incomeYearlyGross * prsiRate;
-    }
-
-    // USC
-    static int uscCutOff1 = 12012;  // first USC cut-off point
-    static int uscCutOff2 = 8472;  // second USC cut-off point
-    static int uscCutOff3 = 49560;  // third USC cut-off point
-
-    static double uscExempt = 13000;    // income threshold exempt from USC
-
-    static double uscRate1 = 0.005;  // USC rate for first cut-off point (uscCutOff1)
-    static double uscRate2 = 0.02;  // USC rate for second cut-off point (uscCutOff2)
-    static double uscRate3 = 0.045;  // USC rate for third cut-off point (uscCutOff3)
-    static double uscRate4 = 0.08;  // USC rate for the remaining balance over three cut-off points
-
-    static double usc1;
-    static double usc2;
-    static double usc3;
-    static double usc4;
-    static double uscTotal;
-
-    double CalculateUsc()
-    {
-        if (incomeYearlyGross == 0 || incomeYearlyGross <= uscExempt)
-        {
-            usc1 = 0;
-            usc2 = 0;
-            usc3 = 0;
-            usc4 = 0;
-        }
-        // USC for the first and second cut-off point
-        else if (incomeYearlyGross > uscExempt && incomeYearlyGross <= uscCutOff1 + uscCutOff2)
-        {
-            usc1 = uscCutOff1 * uscRate1;
-            usc2 = (incomeYearlyGross - uscCutOff1) * uscRate2;
-            usc3 = 0;
-            usc4 = 0;
-        }
-        // USC for the next (third) cut-off point
-        else if (incomeYearlyGross > uscCutOff1 + uscCutOff2 && incomeYearlyGross <= uscCutOff1 + uscCutOff2 + uscCutOff3)
-        {
-            usc1 = uscCutOff1 * uscRate1;
-            usc2 = uscCutOff2 * uscRate2;
-            usc3 = (incomeYearlyGross - uscCutOff1 - uscCutOff2) * uscRate3;
-            usc4 = 0;
-        }
-        // USC for the remaining balance
-        else if (incomeYearlyGross > uscCutOff1 + uscCutOff2 + uscCutOff3)
-        {
-            usc1 = uscCutOff1 * uscRate1;
-            usc2 = uscCutOff2 * uscRate2;
-            usc3 = uscCutOff3 * uscRate3;
-            usc4 = (incomeYearlyGross - uscCutOff1 - uscCutOff2 - uscCutOff3) * uscRate4;
-        }
-        return uscTotal = usc1 + usc2 + usc3 + usc4;
-    }
-
-    double deductionsTotalYearly;
-
-    double CalculateTotalDeductions()
-    {
-        return deductionsTotalYearly = totalTaxPayableYearly + prsiTotal + uscTotal;
-    }
-
-    double incomeYearlyNet;
-    double incomeWeeklyNet;
-
-    double CalculateIncomeYearlyNet()
-    {
-        return incomeYearlyNet = incomeYearlyGross - deductionsTotalYearly;
-    }
-
-    double CalculateIncomeWeeklyNet()
-    {
-        return incomeWeeklyNet = incomeYearlyNet / 52;
-    }
-
-    public void Calculate()
-    {
-        CalculateIncomeWeeklyGross();
-        CalculateIncomeYearlyGross();
-
-        CalculateTotalTaxYearly();
-        CalculateTotalTaxPayableYearly();
-        CalculatePrsi();
-        CalculateUsc();
-        CalculateTotalDeductions();
-
-        CalculateIncomeYearlyNet();
-        CalculateIncomeWeeklyNet();
-    }
-
-}
