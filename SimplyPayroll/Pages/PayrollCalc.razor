@@ -65,9 +65,9 @@
 
             // GROSS INCOME
             /// <summary>Represents weekly gross income.</summary>
-            static double incomeWeeklyGross;
+            double incomeWeeklyGross;
             /// <summary>Represents yearly gross income.</summary>
-            static double incomeYearlyGross;
+            double incomeYearlyGross;
 
             /// <summary>Calculates weekly gross income from the values entered into the form.</summary>
             /// <returns>Weekly gross income.</returns>
@@ -145,9 +145,9 @@
 
             // PRSI
             /// <summary>Represents PRSI rate.</summary>
-            static double prsiRate = 0.04;
+            double prsiRate = 0.04;
             /// <summary>Represents calculated total PRSI.</summary>
-            static double prsiTotal;
+            double prsiTotal;
 
             /// <summary>Calculates PRSI.</summary>
             /// <returns>Total PRSI.</returns>
@@ -158,31 +158,31 @@
 
             // USC
             /// <summary>Represents first USC cut-off point.</summary>
-            static int uscCutOff1 = 12012;
+            int uscCutOff1 = 12012;
             /// <summary>Represents second USC cut-off point.</summary>
-            static int uscCutOff2 = 8472;
+            int uscCutOff2 = 8472;
             /// <summary>Represents third USC cut-off point.</summary>
-            static int uscCutOff3 = 49560;
+            int uscCutOff3 = 49560;
             /// <summary>Represents income threshold exempt from USC.</summary>
-            static double uscExempt = 13000;
+            double uscExempt = 13000;
             /// <summary>Represents USC rate for first cut-off point (uscCutOff1).</summary>
-            static double uscRate1 = 0.005;
+            double uscRate1 = 0.005;
             /// <summary>Represents USC rate for second cut-off point (uscCutOff2).</summary>
-            static double uscRate2 = 0.02;
+            double uscRate2 = 0.02;
             /// <summary>Represents USC rate for third cut-off point (uscCutOff3).</summary>
-            static double uscRate3 = 0.045;
+            double uscRate3 = 0.045;
             /// <summary>Represents USC rate for the remaining balance over three cut-off points.</summary>
-            static double uscRate4 = 0.08;
+            double uscRate4 = 0.08;
             /// <summary>Represents USC for the first cut-off point.</summary>
-            static double usc1;
+            double usc1;
             /// <summary>Represents USC for the second cut-off point.</summary>
-            static double usc2;
+            double usc2;
             /// <summary>Represents USC for the third cut-off point.</summary>
-            static double usc3;
+            double usc3;
             /// <summary>Represents USC for the remaining balancce of incocme above all cut-off points.</summary>
-            static double usc4;
+            double usc4;
             /// <summary>Represents USC for the total USC.</summary>
-            static double uscTotal;
+            double uscTotal;
 
             /// <summary>Calculates USC for all cut-off points and total USC.</summary>
             /// <returns>Total USC.</returns>

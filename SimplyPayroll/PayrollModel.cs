@@ -5,8 +5,7 @@ using System.Threading.Tasks;
 
 namespace SimplyPayroll
 {
-    /// <summary> provides a context for user’s input values binding.</summary>
-    /// <remarks></remarks>
+    /// <summary> Provides a context for user’s input values binding.</summary>
     public class PayrollModel
     {
         /// <summary>Represents a number of hours worked from user’s input.</summary>
