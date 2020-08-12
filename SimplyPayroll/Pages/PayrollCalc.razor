@@ -29,7 +29,7 @@
             </EditForm>
         </div>
 
-        @if (results == true && payroll.hoursWorked != 0 && payroll.hourlyRate != 0)
+        @if (resultsDisplayed == true && payroll.hoursWorked != 0 && payroll.hourlyRate != 0)
         {
             <div class="col">
                 <p>Gross income weekly : @incomeWeeklyGross.ToString("C")</p>
@@ -63,31 +63,47 @@
         @code {
             PayrollModel payroll = new PayrollModel();
 
-            // income
+            // GROSS INCOME
+            /// <summary>Represents weekly gross income.</summary>
             static double incomeWeeklyGross;
+            /// <summary>Represents yearly gross income.</summary>
             static double incomeYearlyGross;
 
+            /// <summary>Calculates weekly gross income from the values entered into the form.</summary>
+            /// <returns>Weekly gross income.</returns>
             double CalculateIncomeWeeklyGross()
             {
                 return incomeWeeklyGross = payroll.hoursWorked * payroll.hourlyRate;
             }
 
+            /// <summary>Calculates yearly gross income from weekly gross income</summary>
+            /// <returns>Yearly gross income.</returns>
             double CalculateIncomeYearlyGross()
             {
                 return incomeYearlyGross = incomeWeeklyGross * 52;
             }
 
-            // tax
+            // TAX
+            /// <summary>Represents tax credit.</summary>
             int taxCredit = 3300;
-            double taxLimitStandard = 35300;    // income threshold taxed at standard rate
-            double taxRateStandard = 0.2;    // income threshold taxed at standard rate
-            double taxRateHigher = 0.4;    // income threshold taxed at higher rate
-            double tax1;     // tax at standard rate
-            double tax2;     // tax at higher rate
+            /// <summary>Represents income threshold taxed at standard rate.</summary>
+            double taxLimitStandard = 35300;
+            /// <summary>Represents standard tax rate.</summary>
+            double taxRateStandard = 0.2;
+            /// <summary>Represents higher tax rate (for the income above threshold).</summary>
+            double taxRateHigher = 0.4;
+            /// <summary>Represents tax calculated at standard rate.</summary>
+            double tax1;
+            /// <summary>Represents tax calculated at higher rate.</summary>
+            double tax2;
+            /// <summary>Represents total yearly tax.</summary>
             double taxTotalYearly;
-            double totalTaxPayableYearly;   // total tax yearly less tax credit
+            /// <summary>Represents total payable yearly tax.</summary>
+            double totalTaxPayableYearly;
 
-            double CalculateTotalTaxYearly()  // total tax yearly before tax credit
+            /// <summary>Calculates total tax yearly before tax credit.</summary>
+            /// <returns>Total yearly tax.</returns>
+            double CalculateTotalTaxYearly()
             {
                 if (incomeYearlyGross == 0 || incomeYearlyGross <= taxCredit)
                 {
@@ -111,6 +127,9 @@
                 return taxTotalYearly = tax1 + tax2;
             }
 
+            /// <summary>Calculates total payable yearly tax.</summary>
+            /// <remarks>Total tax yearly less tax credit.</remarks>
+            /// <returns>Total payable yearly tax.</returns>
             double CalculateTotalTaxPayableYearly()
             {
                 if (taxTotalYearly < taxCredit)
@@ -125,32 +144,48 @@
 
 
             // PRSI
+            /// <summary>Represents PRSI rate.</summary>
             static double prsiRate = 0.04;
+            /// <summary>Represents calculated total PRSI.</summary>
             static double prsiTotal;
 
+            /// <summary>Calculates PRSI.</summary>
+            /// <returns>Total PRSI.</returns>
             double CalculatePrsi()
             {
                 return prsiTotal = incomeYearlyGross * prsiRate;
             }
 
             // USC
-            static int uscCutOff1 = 12012;  // first USC cut-off point
-            static int uscCutOff2 = 8472;  // second USC cut-off point
-            static int uscCutOff3 = 49560;  // third USC cut-off point
-
-            static double uscExempt = 13000;    // income threshold exempt from USC
-
-            static double uscRate1 = 0.005;  // USC rate for first cut-off point (uscCutOff1)
-            static double uscRate2 = 0.02;  // USC rate for second cut-off point (uscCutOff2)
-            static double uscRate3 = 0.045;  // USC rate for third cut-off point (uscCutOff3)
-            static double uscRate4 = 0.08;  // USC rate for the remaining balance over three cut-off points
-
+            /// <summary>Represents first USC cut-off point.</summary>
+            static int uscCutOff1 = 12012;
+            /// <summary>Represents second USC cut-off point.</summary>
+            static int uscCutOff2 = 8472;
+            /// <summary>Represents third USC cut-off point.</summary>
+            static int uscCutOff3 = 49560;
+            /// <summary>Represents income threshold exempt from USC.</summary>
+            static double uscExempt = 13000;
+            /// <summary>Represents USC rate for first cut-off point (uscCutOff1).</summary>
+            static double uscRate1 = 0.005;
+            /// <summary>Represents USC rate for second cut-off point (uscCutOff2).</summary>
+            static double uscRate2 = 0.02;
+            /// <summary>Represents USC rate for third cut-off point (uscCutOff3).</summary>
+            static double uscRate3 = 0.045;
+            /// <summary>Represents USC rate for the remaining balance over three cut-off points.</summary>
+            static double uscRate4 = 0.08;
+            /// <summary>Represents USC for the first cut-off point.</summary>
             static double usc1;
+            /// <summary>Represents USC for the second cut-off point.</summary>
             static double usc2;
+            /// <summary>Represents USC for the third cut-off point.</summary>
             static double usc3;
+            /// <summary>Represents USC for the remaining balancce of incocme above all cut-off points.</summary>
             static double usc4;
+            /// <summary>Represents USC for the total USC.</summary>
             static double uscTotal;
 
+            /// <summary>Calculates USC for all cut-off points and total USC.</summary>
+            /// <returns>Total USC.</returns>
             double CalculateUsc()
             {
                 if (incomeYearlyGross == 0 || incomeYearlyGross <= uscExempt)
@@ -187,33 +222,49 @@
                 return uscTotal = usc1 + usc2 + usc3 + usc4;
             }
 
+            /// <summary>Represents total yearly deductions.</summary>
             double deductionsTotalYearly;
 
+            /// <summary>Calculates total yearly deductions.</summary>
+            /// <remarks>Adds total payable yearly tax, total PRSI, and total USC.</remarks>
+            /// <returns>Total yearly deductions.</returns>
             double CalculateTotalDeductions()
             {
                 return deductionsTotalYearly = totalTaxPayableYearly + prsiTotal + uscTotal;
             }
 
+            // NET INCOME
+            /// <summary>Represents net yearly income.</summary>
             double incomeYearlyNet;
+            /// <summary>Represents net weekly income.</summary>
             double incomeWeeklyNet;
 
+            /// <summary>Represents net yearly income.</summary>
+            /// <returns>Net yearly income.</returns>
             double CalculateIncomeYearlyNet()
             {
                 return incomeYearlyNet = incomeYearlyGross - deductionsTotalYearly;
             }
 
+            /// <summary>Calculates net weekly income from net yearly income.</summary>
+            /// <returns>Net weekly income.</returns>
             double CalculateIncomeWeeklyNet()
             {
                 return incomeWeeklyNet = incomeYearlyNet / 52;
             }
 
-            bool results = false;
+            /// <summary>Represents a value whether calculations results are displayed.</summary>
+            bool resultsDisplayed = false;
+
+            /// <summary>Checks if calculations results are displayed.</summary>
+            /// <returns><c>true</c> if results are displayed; otherwise, <c>false</c>.</returns>
             bool DisplayResults()
             {
                 //bool results = false;
-                return results = true;
+                return resultsDisplayed = true;
             }
 
+            /// <summary>Handles forms data on submit and calls functions for calculating and displaying results.</summary>
             public void Calculate()
             {
                 CalculateIncomeWeeklyGross();
