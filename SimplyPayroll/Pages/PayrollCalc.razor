@@ -1,21 +1,24 @@
 ﻿@page "/"
 
-
 <div class="container">
     <div class="row">
         <h1>Payroll Calculator</h1>
     </div>
     <div class="row mt-3">
         <div class="col">
-            <EditForm Model="@payroll" OnSubmit="Calculate">
+            <EditForm Model="@Payroll" OnValidSubmit="Calculate">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
                 <div class="form-group row">
-                    <label for="hoursWorked" class="col-form-label col-sm-7">Hours worked weekly</label>
-                    <InputNumber id="hoursWorked" @bind-Value="payroll.hoursWorked" class="form-control col-sm-3" required />
+                    <label for="Hours" class="col-form-label col-sm-7">Hours worked weekly</label>
+                    <InputNumber id="Hours" name="Hours worked" @bind-Value="@Payroll.HoursWorked" class="form-control col-sm-3"  />
+                    <ValidationMessage For="@(() => Payroll.HoursWorked)" class="text-right" />
                 </div>
 
                 <div class="form-group row">
                     <label for="hourlyRate" class="col-form-label col-sm-7">Hourly rate</label>
-                    <InputNumber id="hourlyRate" @bind-Value="payroll.hourlyRate" class="form-control col-sm-3" required />
+                    <InputNumber id="hourlyRate" @bind-Value="@Payroll.HourlyRate" class="form-control col-sm-3"  />
+                    <ValidationMessage For="@(() => Payroll.HourlyRate)" />
                 </div>
 
                 <div class="row">
@@ -24,12 +27,12 @@
                     </div>
                 </div>
                 <hr />
-                <p>Hours worked weekly: @payroll.hoursWorked</p>
-                <p>Hourly rate: @payroll.hourlyRate.ToString("C")</p>
+                <p>Hours worked weekly: @Payroll.HoursWorked</p>
+                <p>Hourly rate: @Payroll.HourlyRate.ToString("C")</p>
             </EditForm>
         </div>
 
-        @if (resultsDisplayed == true && payroll.hoursWorked != 0 && payroll.hourlyRate != 0)
+        @if (resultsDisplayed == true && Payroll.HoursWorked != 0 && Payroll.HourlyRate != 0)
         {
             <div class="col">
                 <p>Gross income weekly : @incomeWeeklyGross.ToString("C")</p>
@@ -61,7 +64,7 @@
 
 
         @code {
-            PayrollModel payroll = new PayrollModel();
+            PayrollModel Payroll = new PayrollModel();
 
             // GROSS INCOME
             /// <summary>Represents weekly gross income.</summary>
@@ -73,7 +76,7 @@
             /// <returns>Weekly gross income.</returns>
             double CalculateIncomeWeeklyGross()
             {
-                return incomeWeeklyGross = payroll.hoursWorked * payroll.hourlyRate;
+                return incomeWeeklyGross = Payroll.HoursWorked * Payroll.HourlyRate;
             }
 
             /// <summary>Calculates yearly gross income from weekly gross income</summary>
@@ -281,4 +284,8 @@
                 DisplayResults();
             }
 
+            //public void HandleValidSubmit()
+            //{
+            //    Calculate();
+            //}
         }
