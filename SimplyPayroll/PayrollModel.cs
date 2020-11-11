@@ -16,7 +16,7 @@ namespace SimplyPayroll
         /// <summary>Represents hourly rate from user’s input.</summary>
         [Required]
         [Range(10.10, 100, ErrorMessage = "Hourly rate must be between 10 and 100.")]
-        [Display(Name = "Hourly rate")]        
+        [Display(Name = "Hourly rate")]
         public double HourlyRate { get; set; }
 
     }
